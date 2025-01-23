@@ -43,47 +43,47 @@ const AppNavigator = () => {
 
   return (
     // <NavigationContainer>
-      <Stack.Navigator>
-        {user ? (
-          // User is logged in, show Feed screen
-          <>
-            <Stack.Screen
-              name="Feed"
-              component={FeedScreen}
-              options={{
-                title: 'Feed',
-                headerRight: () => (
-                  <Button
-                    onPress={async () => {
-                      await auth.signOut(); // Sign out the user
-                      await removeData('userId'); // Remove user ID from AsyncStorage
-                      setUser(false); // Update authentication state
-                    }}
-                    title="Logout"
-                  />
-                ),
-              }}
-            />
-            <Stack.Screen
-              name="CreatePost"
-              component={CreatePostScreen}
-              options={{ title: 'Create Post' }}
-            />
-            <Stack.Screen
-              name="Profile"
-              component={ProfileScreen}
-              options={{ title: 'Profile' }}
-            />
-          </>
-        ) : (
-          // User is not logged in, show Auth screen
+    <Stack.Navigator>
+      {user ? (
+        // User is logged in, show Feed screen
+        <>
           <Stack.Screen
-            name="Auth"
-            component={AuthScreen}
-            options={{ title: 'Login / Sign Up', headerShown: false }}
+            name="Feed"
+            component={FeedScreen}
+            options={{
+              title: 'Feed',
+              headerRight: () => (
+                <Button
+                  onPress={async () => {
+                    await auth.signOut(); // Sign out the user
+                    await removeData('userId'); // Remove user ID from AsyncStorage
+                    setUser(false); // Update authentication state
+                  }}
+                  title="Logout"
+                />
+              ),
+            }}
           />
-        )}
-      </Stack.Navigator>
+          <Stack.Screen
+            name="CreatePost"
+            component={CreatePostScreen}
+            options={{ title: 'Create Post' }}
+          />
+          <Stack.Screen
+            name="Profile"
+            component={ProfileScreen}
+            options={{ title: 'Profile' }}
+          />
+        </>
+      ) : (
+        // User is not logged in, show Auth screen
+        <Stack.Screen
+          name="Auth"
+          component={AuthScreen}
+          options={{ title: 'Login / Sign Up', headerShown: false }}
+        />
+      )}
+    </Stack.Navigator>
     // </NavigationContainer>
   );
 };

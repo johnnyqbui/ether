@@ -63,6 +63,8 @@ const FeedScreen = () => {
     }
   };
 
+  console.log({ posts })
+
   // Render each post item
   const renderPost = ({ item }: { item: Post }) => (
     <View style={styles.postContainer}>

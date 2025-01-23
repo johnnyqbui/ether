@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Image, Alert, ActivityIndicator } from 'react-native';
+import { View, TextInput, Button, Image, Alert, ActivityIndicator, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import { firestore, storage, auth } from '../firebase';
+import { firestore, auth } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { uploadImage } from '../s3';
 
 export default function CreatePostScreen() {
   const [text, setText] = useState<string>('');
@@ -37,21 +37,9 @@ export default function CreatePostScreen() {
     setLocation(location);
   };
 
-  const uploadImage = async (uri: string) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    const storageRef = ref(storage, `images/${new Date().toISOString()}`);
-    console.log({ response, blob, storageRef })
-    const result = await uploadBytes(storageRef, blob);
-    console.log({ result })
-    return await getDownloadURL(storageRef);
-  };
-
   const handlePost = async () => {
     console.log('post')
-    console.log({ image })
-    const imageUrl = image ? await uploadImage(image) : null;
-    console.log({ imageUrl })
+
     const userId = auth.currentUser?.uid;
     setIsLoading(true); // Show loading indicator
 
@@ -68,6 +56,12 @@ export default function CreatePostScreen() {
     }
 
     try {
+      let imageUrl = null;
+
+      if (image) {
+        imageUrl = await uploadImage(image); // Upload the image to S3
+      }
+
       // Add the post to Firestore
       await addDoc(collection(firestore, 'posts'), {
         userId,
@@ -89,13 +83,34 @@ export default function CreatePostScreen() {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
-      <TextInput placeholder="What's on your mind?" value={text} onChangeText={setText} />
+      <TextInput style={styles.input} placeholder="What's on your mind?" value={text} onChangeText={setText} />
       <Button title="Pick an image" onPress={pickImage} />
       <Button title="Add Location" onPress={getLocation} />
       <Button title="Post" onPress={handlePost} />
-      {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+      {image && <Image source={{ uri: image }} style={styles.image} />}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  input: {
+    marginBottom: 16,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    minHeight: 100,
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+});
