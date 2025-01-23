@@ -3,6 +3,7 @@ import { View, TextInput, Button, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { saveData } from '../utils/storage';
 
 const AuthScreen = () => {
   const [email, setEmail] = useState<string>('');
@@ -11,7 +12,9 @@ const AuthScreen = () => {
 
   const handleSignUp = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userId = userCredential.user.uid;
+      await saveData('userId', userId); // Save user ID to AsyncStorage
       Alert.alert('Success', 'User signed up!');
       navigation.navigate('Feed'); // Navigate to Feed screen
     } catch (error: any) {
@@ -21,7 +24,9 @@ const AuthScreen = () => {
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userId = userCredential.user.uid;
+      await saveData('userId', userId); // Save user ID to AsyncStorage
       Alert.alert('Success', 'User logged in!');
       navigation.navigate('Feed'); // Navigate to Feed screen
     } catch (error: any) {
