@@ -62,6 +62,7 @@ const AppNavigator = () => {
                   title="Logout"
                 />
               ),
+              headerShown: false
             }}
           />
           <Stack.Screen

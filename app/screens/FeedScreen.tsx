@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {
   collection,
@@ -9,6 +9,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  deleteDoc
 } from 'firebase/firestore';
 import { firestore, auth } from '../firebase';
 
@@ -63,7 +64,21 @@ const FeedScreen = () => {
     }
   };
 
-  console.log({ posts })
+  // Handle post deletion
+  const handleDeletePost = async (postId: string, userId: string) => {
+    const currentUserId = auth.currentUser?.uid;
+    if (currentUserId !== userId) {
+      Alert.alert('Error', 'You can only delete your own posts');
+      return;
+    }
+
+    try {
+      await deleteDoc(doc(firestore, 'posts', postId)); // Delete the post from Firestore
+      Alert.alert('Success', 'Post deleted!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete post');
+    }
+  };
 
   // Render each post item
   const renderPost = ({ item }: { item: Post }) => (
@@ -77,6 +92,12 @@ const FeedScreen = () => {
           title={`Likes: ${item.likes?.length || 0}`}
           onPress={() => handleLike(item.id)}
         />
+        {auth.currentUser?.uid === item.userId && ( // Show delete button only for the creator
+          <Button
+            title="Delete"
+            onPress={() => handleDeletePost(item.id, item.userId)}
+          />
+        )}
       </View>
     </View>
   );
@@ -92,6 +113,10 @@ const FeedScreen = () => {
       <Button
         title="Create Post"
         onPress={() => navigation.navigate('CreatePost')}
+      />
+      <Button
+        title="Go to Profile"
+        onPress={() => navigation.navigate('Profile')} // Navigate to ProfileScreen
       />
     </View>
   );
