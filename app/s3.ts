@@ -1,11 +1,10 @@
 import AWS from 'aws-sdk';
-import Config from 'react-native-config';
 
 // Configure AWS
 AWS.config.update({
-    accessKeyId: Config.AWS_ACCESS_KEY_ID,
-    secretAccessKey: Config.AWS_SECRET_ACCESS_KEY,
-    region: Config.AWS_REGION,
+    accessKeyId: process.env.EXPO_PUBLIC_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.EXPO_PUBLIC_AWS_SECRET_ACCESS_KEY,
+    region: process.env.EXPO_PUBLIC_AWS_REGION,
 });
 
 const s3 = new AWS.S3();

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, Image, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, Alert, TouchableOpacity, Button } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { useThemeColor } from '../hooks/useThemeColor';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
 import {
   collection,
   query,
@@ -16,15 +21,18 @@ import { firestore, auth } from '../firebase';
 interface Post {
   id: string;
   userId: string;
+  userAvatar?: string;
+  username: string;
   text: string;
   imageUrl?: string;
   likes: string[];
+  comments: number;
   timestamp: Date;
 }
 
 const FeedScreen = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   // Fetch posts from Firestore
   useEffect(() => {
@@ -81,26 +89,69 @@ const FeedScreen = () => {
   };
 
   // Render each post item
-  const renderPost = ({ item }: { item: Post }) => (
-    <View style={styles.postContainer}>
-      <Text style={styles.postText}>{item.text}</Text>
-      {item.imageUrl && (
-        <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
-      )}
-      <View style={styles.likeContainer}>
-        <Button
-          title={`Likes: ${item.likes?.length || 0}`}
-          onPress={() => handleLike(item.id)}
-        />
-        {auth.currentUser?.uid === item.userId && ( // Show delete button only for the creator
-          <Button
-            title="Delete"
-            onPress={() => handleDeletePost(item.id, item.userId)}
+  const renderPost = ({ item }: { item: Post }) => {
+    const isLiked = item.likes?.includes(auth.currentUser?.uid || '');
+    const colors = useThemeColor();
+
+    return (
+      <LinearGradient
+        colors={[colors.background, colors.cardBackground]}
+        style={styles.postContainer}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.postHeader}>
+          <Image
+            source={{ uri: item.userAvatar || 'https://i.pravatar.cc/150?img=3' }}
+            style={styles.avatar}
+          />
+          <Text style={styles.username}>{item.username}</Text>
+        </View>
+
+        <Text style={styles.postText}>{item.text}</Text>
+
+        {item.imageUrl && (
+          <Image
+            source={{ uri: item.imageUrl }}
+            style={styles.postImage}
+            resizeMode="cover"
           />
         )}
-      </View>
-    </View>
-  );
+
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => handleLike(item.id)}
+          >
+            <Ionicons
+              name={isLiked ? 'heart' : 'heart-outline'}
+              size={24}
+              color={isLiked ? '#ff4757' : colors.text}
+            />
+            <Text style={styles.actionText}>{item.likes?.length || 0}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="chatbubble-outline" size={24} color={colors.text} />
+            <Text style={styles.actionText}>{item.comments || 0}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="share-social-outline" size={24} color={colors.text} />
+          </TouchableOpacity>
+
+          {auth.currentUser?.uid === item.userId && (
+            <TouchableOpacity
+              style={[styles.actionButton, { marginLeft: 'auto' }]}
+              onPress={() => handleDeletePost(item.id, item.userId)}
+            >
+              <Ionicons name="trash-outline" size={24} color="#ff6b81" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </LinearGradient>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -133,27 +184,47 @@ const styles = StyleSheet.create({
   postContainer: {
     marginBottom: 16,
     padding: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  username: {
+    fontSize: 16,
+    fontWeight: '600',
   },
   postText: {
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 16,
+    lineHeight: 24,
   },
   postImage: {
     width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginBottom: 8,
+    height: 300,
+    borderRadius: 12,
+    marginBottom: 16,
   },
-  likeContainer: {
+  actionsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 16,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  actionText: {
+    fontSize: 14,
   },
 });
 

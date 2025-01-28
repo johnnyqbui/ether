@@ -1,7 +1,6 @@
 import axios from 'axios';
-import Config from 'react-native-config';
 
-const DEEPSEEK_API_KEY = Config.DS_API_KEY // Replace with your DeepSeek API key
+const DEEPSEEK_API_KEY = process.env.EXPO_PUBLIC_DS_API_KEY // Replace with your DeepSeek API key
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/images/generate'; // Replace with the actual DeepSeek API endpoint
 
 export const generateProfilePicture = async (prompt: string) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
 import { getData, removeData } from './utils/storage';
@@ -10,7 +10,7 @@ import CreatePostScreen from './screens/CreatePostScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import { Button } from 'react-native';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   const [user, setUser] = useState<boolean | null>(null); // Track authentication state
@@ -42,50 +42,50 @@ const AppNavigator = () => {
   }
 
   return (
-    // <NavigationContainer>
-    <Stack.Navigator>
-      {user ? (
-        // User is logged in, show Feed screen
-        <>
+    <NavigationContainer>
+      <Stack.Navigator>
+        {user ? (
+          // User is logged in, show Feed screen
+          <>
+            <Stack.Screen
+              name="Feed"
+              component={FeedScreen}
+              options={{
+                title: 'Feed',
+                headerRight: () => (
+                  <Button
+                    onPress={async () => {
+                      await auth.signOut(); // Sign out the user
+                      await removeData('userId'); // Remove user ID from AsyncStorage
+                      setUser(false); // Update authentication state
+                    }}
+                    title="Logout"
+                  />
+                ),
+                headerShown: false
+              }}
+            />
+            <Stack.Screen
+              name="CreatePost"
+              component={CreatePostScreen}
+              options={{ title: 'Create Post' }}
+            />
+            <Stack.Screen
+              name="Profile"
+              component={ProfileScreen}
+              options={{ title: 'Profile' }}
+            />
+          </>
+        ) : (
+          // User is not logged in, show Auth screen
           <Stack.Screen
-            name="Feed"
-            component={FeedScreen}
-            options={{
-              title: 'Feed',
-              headerRight: () => (
-                <Button
-                  onPress={async () => {
-                    await auth.signOut(); // Sign out the user
-                    await removeData('userId'); // Remove user ID from AsyncStorage
-                    setUser(false); // Update authentication state
-                  }}
-                  title="Logout"
-                />
-              ),
-              headerShown: false
-            }}
+            name="Auth"
+            component={AuthScreen}
+            options={{ title: 'Login / Sign Up', headerShown: false }}
           />
-          <Stack.Screen
-            name="CreatePost"
-            component={CreatePostScreen}
-            options={{ title: 'Create Post' }}
-          />
-          <Stack.Screen
-            name="Profile"
-            component={ProfileScreen}
-            options={{ title: 'Profile' }}
-          />
-        </>
-      ) : (
-        // User is not logged in, show Auth screen
-        <Stack.Screen
-          name="Auth"
-          component={AuthScreen}
-          options={{ title: 'Login / Sign Up', headerShown: false }}
-        />
-      )}
-    </Stack.Navigator>
-    // </NavigationContainer>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
