@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
-import firebase from '@react-native-firebase/app';
-import '@react-native-firebase/firestore';
+// import firebase from '@react-native-firebase/app';
+// import '@react-native-firebase/firestore';
 
 // Define the structure of a travel plan
 interface TravelPlan {

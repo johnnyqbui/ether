@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Image, StyleSheet, Alert } from 'react-native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { firestore, auth } from '../firebase';
-import { generateProfilePicture } from '../deepseek';
+import { firestore, auth } from '../../../services/firebase';
+import { generateProfilePicture } from '../../../services/deepseek';
 
 const ProfileScreen = () => {
   const [bio, setBio] = useState<string>('');

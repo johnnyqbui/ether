@@ -1,5 +1,5 @@
 import { Button } from 'react-native';
-import { auth } from '../app/firebase';
+import { auth } from '../services/firebase';
 import { signOut } from 'firebase/auth';
 import { router } from 'expo-router';
 
