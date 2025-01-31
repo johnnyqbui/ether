@@ -3,9 +3,9 @@ import { View, TextInput, Button, Image, Alert, ActivityIndicator, StyleSheet } 
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import { firestore, auth } from '../../services/firebase';
+import { firestore, auth } from '@/services/firebase';
 import { collection, addDoc } from 'firebase/firestore';
-import { uploadImage } from '../../services/s3';
+import { uploadImage } from '@/services/s3';
 
 export default function CreatePostScreen() {
   const [text, setText] = useState<string>('');

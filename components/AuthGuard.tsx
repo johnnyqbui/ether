@@ -2,10 +2,10 @@ import { Redirect } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function AuthGuard({ children }) {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
-    if (!user) {
-        return <Redirect href="../app/(auth)/index" />;
+    if (!user && !loading) {
+        return <Redirect href="/(auth)" />;
     }
 
     return children;

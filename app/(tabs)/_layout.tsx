@@ -7,6 +7,7 @@ export default function TabsLayout() {
     const text = useThemeColor({}, 'text');
     const background = useThemeColor({}, 'background');
 
+    console.log('tabs layout')
     return (
         <Tabs
             screenOptions={{
@@ -16,6 +17,7 @@ export default function TabsLayout() {
                     backgroundColor: background, // Tab bar background color
                     borderTopWidth: 0, // Remove the top border
                 },
+                headerShown: false,
             }}
         >
             {/* Home Tab */}
@@ -29,9 +31,31 @@ export default function TabsLayout() {
                 }}
             />
 
+            {/* Experiences Tab */}
+            <Tabs.Screen
+                name="experiences"
+                options={{
+                    title: 'Experiences',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="navigate" size={size} color={color} />
+                    ),
+                }}
+            />
+
+            {/* Post Tab */}
+            <Tabs.Screen
+                name="post"
+                options={{
+                    title: 'Post',
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="add" size={size} color={color} />
+                    ),
+                }}
+            />
+
             {/* Explore Tab */}
             <Tabs.Screen
-                name="explore/index"
+                name="explore"
                 options={{
                     title: 'Explore',
                     tabBarIcon: ({ color, size }) => (
@@ -42,7 +66,7 @@ export default function TabsLayout() {
 
             {/* Profile Tab */}
             <Tabs.Screen
-                name="profile/index"
+                name="profile"
                 options={{
                     title: 'Profile',
                     tabBarIcon: ({ color, size }) => (

@@ -59,7 +59,7 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.title}>Profilet</Text>
 
       {profilePicture && (
         <Image source={{ uri: profilePicture }} style={styles.profileImage} />
